@@ -1,0 +1,2 @@
+-- Loaders are created in data-final-fixes so that every mod's transport belts,
+-- belt speeds, recipes and technologies are already available.

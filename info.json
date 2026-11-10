@@ -1,0 +1,15 @@
+{
+  "name": "k2-loaders",
+  "version": "1.0.0",
+  "title": "K2 装卸机（独立版）",
+  "author": "Gpx；装卸机原型与美术资源来自 Krastorio 2（Linver、Krastor、raiguard）",
+  "contact": "",
+  "homepage": "",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.0",
+    "? space-age",
+    "! Krastorio2"
+  ],
+  "description": "从 Krastorio 2 提取的 1x1 装卸机独立版。会自动为游戏中的每一档传送带（包括 Pyanodons、Bob's、Angel's 和太空时代）生成对应装卸机，配方与科技解锁跟随对应传送带。\n\n致谢与引用来源：\n- 原型与玩法来自 Krastorio 2（作者：Linver、Krastor、raiguard，LGPL-3.0）：https://mods.factorio.com/mod/Krastorio2\n- 装卸机实体、配方、贴图与吸附逻辑改编自 Krastorio 2 源码（prototypes/buildings/*loader*.lua、scripts/loader-snapping.lua）。\n- 装卸机结构贴图与图标来自 Krastorio2Assets（LGPL-3.0）。\n详细来源与文件清单见 CREDITS.md。\n\n本 mod 与 Krastorio 2 互斥，无法同时启用。"
+}
