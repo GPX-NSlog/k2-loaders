@@ -3,9 +3,10 @@ param(
   [string]$Mode = 'release',
   [string]$ApiKey = $env:FACTORIO_API_KEY,
   [string]$ProjectRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path,
-  [string]$Category = 'logistics',
-  [string]$License = 'GNU LGPL v3.0',
-  [string]$SourceUrl = 'https://github.com/GPX-NSlog/k2-loaders'
+  [string]$Category = 'content',
+  [string]$License = 'GNU LGPLv3',
+  [string]$SourceUrl = 'https://github.com/GPX-NSlog/k2-loaders',
+  [string]$Proxy = $env:HTTPS_PROXY
 )
 
 # Usage:
@@ -13,6 +14,7 @@ param(
 #   Later releases:                                 .\tools\publish.ps1 -Mode release
 # Get an API key from https://factorio.com/profile (Mod Portal upload key).
 # You can also put $ApiKey = '...' into tools/config.local.ps1 (gitignored).
+# If the machine needs an HTTP proxy, set $env:HTTPS_PROXY or pass -Proxy.
 
 $ErrorActionPreference = 'Stop'
 
@@ -39,7 +41,17 @@ $headers = @{
   Authorization = "Bearer $ApiKey"
 }
 
-$init = Invoke-RestMethod -Method Post -Uri $initUrl -Headers $headers -Body @{ mod = $info.name }
+$initParams = @{
+  Method  = 'Post'
+  Uri     = $initUrl
+  Headers = $headers
+  Body    = @{ mod = $info.name }
+}
+if (-not [string]::IsNullOrWhiteSpace($Proxy)) {
+  $initParams['Proxy'] = $Proxy
+}
+
+$init = Invoke-RestMethod @initParams
 $uploadUrl = $init.upload_url
 if (-not $uploadUrl) {
   throw "Factorio API did not return upload_url. Response: $($init | ConvertTo-Json -Depth 10)"
@@ -60,7 +72,12 @@ if ($Mode -eq 'new') {
   $content.Add((New-Object System.Net.Http.StringContent($SourceUrl)), 'source_url')
 }
 
-$httpClient = New-Object System.Net.Http.HttpClient
+$handler = New-Object System.Net.Http.HttpClientHandler
+if (-not [string]::IsNullOrWhiteSpace($Proxy)) {
+  $handler.Proxy = New-Object System.Net.WebProxy($Proxy)
+  $handler.UseProxy = $true
+}
+$httpClient = New-Object System.Net.Http.HttpClient($handler)
 $httpResponse = $httpClient.PostAsync($uploadUrl, $content).Result
 
 if ($httpResponse.IsSuccessStatusCode) {
