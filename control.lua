@@ -11,6 +11,21 @@ local LEGACY_NAMES = {
   ["k2-ultimate-loader"] = "kr-superior-loader",
 }
 
+local FILTER_COUNT = 5
+
+---@param entity LuaEntity
+---@return table
+local function read_filters(entity)
+  local filters = {}
+  for index = 1, FILTER_COUNT do
+    local filter = entity.get_filter(index)
+    if filter then
+      filters[index] = filter
+    end
+  end
+  return filters
+end
+
 local function migrate_loader(entity, new_name)
   if not entity.valid then
     return
@@ -23,13 +38,7 @@ local function migrate_loader(entity, new_name)
   local quality = entity.quality
   local health = entity.health
 
-  local filters = {}
-  for index = 1, entity.filter_count or 0 do
-    local ok, filter = pcall(entity.get_filter, entity, index)
-    if ok and filter then
-      filters[index] = filter
-    end
-  end
+  local filters = read_filters(entity)
 
   entity.destroy()
 
@@ -50,7 +59,7 @@ local function migrate_loader(entity, new_name)
   end
 
   for index, filter in pairs(filters) do
-    pcall(created.set_filter, created, index, filter)
+    created.set_filter(index, filter)
   end
 end
 
@@ -62,7 +71,10 @@ script.on_configuration_changed(function()
         type = "loader-1x1",
       })
       for _, entity in pairs(entities) do
-        migrate_loader(entity, new_name)
+        local ok, err = pcall(migrate_loader, entity, new_name)
+        if not ok then
+          log("[k2-loaders] failed to migrate " .. legacy_name .. ": " .. tostring(err))
+        end
       end
     end
   end
