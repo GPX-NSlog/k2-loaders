@@ -3,33 +3,40 @@ local sounds = require("__base__.prototypes.entity.sounds")
 
 local loaders = {}
 
+-- The names used by Krastorio 2 are kept on purpose: blueprints created while
+-- playing with Krastorio 2 then still work after switching to this mod.
 local FIXED_TIERS = {
   ["transport-belt"] = {
-    name = "k2-loader",
+    name = "kr-loader",
+    legacy = "k2-loader",
     icon = "__k2-loaders__/graphics/icons/loader.png",
     tint = { 249, 207, 70 },
     drain = "400W",
   },
   ["fast-transport-belt"] = {
-    name = "k2-fast-loader",
+    name = "kr-fast-loader",
+    legacy = "k2-fast-loader",
     icon = "__k2-loaders__/graphics/icons/fast-loader.png",
     tint = { 228, 24, 38 },
     drain = "500W",
   },
   ["express-transport-belt"] = {
-    name = "k2-express-loader",
+    name = "kr-express-loader",
+    legacy = "k2-express-loader",
     icon = "__k2-loaders__/graphics/icons/express-loader.png",
     tint = { 90, 190, 220 },
     drain = "500W",
   },
   ["turbo-transport-belt"] = {
-    name = "k2-turbo-loader",
+    name = "kr-advanced-loader",
+    legacy = "k2-turbo-loader",
     icon = "__k2-loaders__/graphics/icons/advanced-loader.png",
     tint = { 76, 232, 48 },
     drain = "1kW",
   },
   ["ultimate-transport-belt"] = {
-    name = "k2-ultimate-loader",
+    name = "kr-superior-loader",
+    legacy = "k2-ultimate-loader",
     icon = "__k2-loaders__/graphics/icons/superior-loader.png",
     tint = { 151, 34, 191 },
     drain = "1.5kW",
@@ -365,6 +372,24 @@ function loaders.create_loaders(options)
     end
 
     data:extend({ item, recipe, entity })
+
+    -- Older versions of this mod used k2-* names. Keep them as hidden
+    -- prototypes so existing saves load, control.lua converts them on startup.
+    if fixed and fixed.legacy then
+      local legacy_item = table.deepcopy(item)
+      legacy_item.name = fixed.legacy
+      legacy_item.hidden = true
+      legacy_item.place_result = fixed.legacy
+      legacy_item.order = nil
+
+      local legacy_entity = table.deepcopy(entity)
+      legacy_entity.name = fixed.legacy
+      legacy_entity.minable = { mining_time = 0.25, result = fixed.legacy }
+      legacy_entity.placeable_by = { item = fixed.legacy, count = 1 }
+      legacy_entity.next_upgrade = nil
+
+      data:extend({ legacy_item, legacy_entity })
+    end
 
     recipes_to_unlock[#recipes_to_unlock + 1] = {
       recipe_name = tier.loader_name,

@@ -13,6 +13,7 @@
 - 配方跟随对应传送带的配方：继承其 `categories`（例如 Py 的流体制作类别）与 `surface_conditions`。
 - 科技解锁跟随传送带：挂到解锁该传送带的科技上；起始即可用的传送带则挂到 `logistics` 科技。
 - 保留 K2 装卸机的原始特性：1x1 体积、5 个过滤器槽位、与传送带快速替换、放置时自动吸附并翻转方向。
+- 沿用 Krastorio 2 的原型名称（`kr-loader`、`kr-fast-loader`、`kr-express-loader`、`kr-advanced-loader`、`kr-superior-loader`），K2 存档里的蓝图可以直接粘贴使用。
 - 支持 `max_belt_stack_size`，与 Py 的传送带堆叠机制兼容。
 
 ## 设置项（启动设置）
