@@ -65,15 +65,19 @@ end
 
 script.on_configuration_changed(function()
   for legacy_name, new_name in pairs(LEGACY_NAMES) do
-    for _, surface in pairs(game.surfaces) do
-      local entities = surface.find_entities_filtered({
-        name = legacy_name,
-        type = "loader-1x1",
-      })
-      for _, entity in pairs(entities) do
-        local ok, err = pcall(migrate_loader, entity, new_name)
-        if not ok then
-          log("[k2-loaders] failed to migrate " .. legacy_name .. ": " .. tostring(err))
+    -- A legacy prototype only exists if its belt tier exists, so never query
+    -- entities by a name that this save's prototype list does not contain.
+    if prototypes.entity[legacy_name] and prototypes.entity[new_name] then
+      for _, surface in pairs(game.surfaces) do
+        local entities = surface.find_entities_filtered({
+          name = legacy_name,
+          type = "loader-1x1",
+        })
+        for _, entity in pairs(entities) do
+          local ok, err = pcall(migrate_loader, entity, new_name)
+          if not ok then
+            log("[k2-loaders] failed to migrate " .. legacy_name .. ": " .. tostring(err))
+          end
         end
       end
     end
